@@ -5,7 +5,7 @@ app.MapGet("/", () => "go /books");
 
 List<Book> books = new()
 {
-    new Book {id = 1, Title="Yüzüklerin Efendisi", Author="J.R.R" },
+    new Book {id = 1, Title="Yüzüklerin Efendisi", Author="J.R.R Tolkien" },
     new Book {id = 2, Title="Yüksek satodaki adam", Author="Philip Kindred Dick" }
 };
 
