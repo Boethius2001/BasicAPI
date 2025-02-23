@@ -17,46 +17,46 @@ app.MapGet("/books", async (BookContext db) =>
     return db.Books;
 });
 
-/*
-
 // belirtilen id ye göre veriyi döndürür
-app.MapGet("/books/{id}", (int id) =>
+app.MapGet("/books/{id}", (int id, BookContext db) =>
 {
-    var book = books.FirstOrDefault(b => b.id == id); // eslesen id ye göre veriyi depola
+    var book = db.Books.FirstOrDefault(b => b.id == id);
+
     return book;
 });
-
-*/
 
 // kitap eklemek
 app.MapPost("/books", async(Book book, BookContext db) =>
 {
-
     db.Books.Add(book);
+
     await db.SaveChangesAsync(); // veritabanýna kaydet
+
     return Results.Redirect("/books");
 });
 
-/*
-
 // kitap verisini güncellemek
-app.MapPut("/books/{id}", (int id, Book UpdatedBook) =>
+app.MapPut("/books/{id}", async(int id, Book UpdatedBook, BookContext db) =>
 {
-    var OldBook = books.FirstOrDefault(b => b.id == id);
+    var book = db.Books.FirstOrDefault(b => b.id == id);
 
-    OldBook.Title = UpdatedBook.Title;
-    OldBook.Author = UpdatedBook.Author;
+    book.Title = UpdatedBook.Title;
+    book.Author = UpdatedBook.Author;
+
+    await db.SaveChangesAsync();
+
     return Results.Redirect("/books");
 });
 
 // kitap verisini silmek
-app.MapDelete("/books/{id}", (int id) =>
+app.MapDelete("/books/{id}", async(int id, BookContext db) =>
 {
-    var book = books.FirstOrDefault(b => b.id == id);
-    books.Remove(book);
+    var book = db.Books.FirstOrDefault(b => b.id == id);
+    db.Books.Remove(book);
+
+    await db.SaveChangesAsync();
+
     return Results.Redirect("/books");
 });
-
-*/
 
 app.Run();
