@@ -1,17 +1,23 @@
+using BasicAPI;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// veritabaný baðlantýsý
+builder.Services.AddDbContext<BookContext>(options =>
+    options.UseSqlite("Data Source=Library.db"));
+
 var app = builder.Build();
 
 app.MapGet("/", () => "go /books");
 
-List<Book> books = new()
-{
-    new Book {id = 1, Title="Yüzüklerin Efendisi", Author="J.R.R Tolkien" },
-    new Book {id = 2, Title="Yüksek satodaki adam", Author="Philip Kindred Dick" },
-    new Book {id = 3, Title="Odysseia", Author="Homeros"}
-};
-
 // bütün kitap verilerini döndürür
-app.MapGet("/books", () => books);
+app.MapGet("/books", async (BookContext db) =>
+{
+    return db.Books;
+});
+
+/*
 
 // belirtilen id ye göre veriyi döndürür
 app.MapGet("/books/{id}", (int id) =>
@@ -20,13 +26,18 @@ app.MapGet("/books/{id}", (int id) =>
     return book;
 });
 
+*/
+
 // kitap eklemek
-app.MapPost("/books", (Book book) =>
+app.MapPost("/books", async(Book book, BookContext db) =>
 {
-    book.id = books.Max(b => b.id) + 1; //sayý olarak en büyük id ye 1 ekler
-    books.Add(book);
+
+    db.Books.Add(book);
+    await db.SaveChangesAsync(); // veritabanýna kaydet
     return Results.Redirect("/books");
 });
+
+/*
 
 // kitap verisini güncellemek
 app.MapPut("/books/{id}", (int id, Book UpdatedBook) =>
@@ -46,13 +57,6 @@ app.MapDelete("/books/{id}", (int id) =>
     return Results.Redirect("/books");
 });
 
-app.Run();
-
-/*
-class Book
-{
-    public int id { get; set; }
-    public string Title { get; set; }
-    public string Author { get; set; }
-}
 */
+
+app.Run();
